@@ -5,8 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Phaser Sandbox</title>
+    <style>
+        @font-face {
+            font-family: 'Commodore';
+            font-style: normal;
+            font-weight: 400;
+            src: url(Commodore.ttf) format('truetype');
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #000;
+        }
+
+        html,
+        body,
+        #root {
+            height: 100%;
+            width: 100%;
+            display: flex;
+        }
+
+        canvas {
+            border: 2px solid white;
+            margin: auto auto 1rem;
+        }
+    </style>
 </head>
 <body>
+    <div style="color: white; font-family: 'Commodore'; position: fixed; left: 50%; top: 1rem; transform: translateX(-50%);">
+        <p style="margin-bottom: 1rem">DOWNCHILL</p>
+
+        <p style="line-height: 1.25">Use the arrow keys to move your skier (red blob). Collect GOLD (yellow blobs).</p>
+    </div>
     <div id="root"></div>
 </body>
 </html>

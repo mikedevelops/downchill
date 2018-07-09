@@ -1,20 +1,44 @@
+import GameManager from '../Managers/GameManager';
+
 export interface LevelCoord {
     x: number;
     y: number;
     entity: number;
+    value: number;
+    spent: boolean;
 }
 
 export type ParsedLevel = LevelCoord[];
 
 export default class Level {
     private parsedLevel: ParsedLevel;
+    private levelLength: number;
+    private destroyedEntities: LevelCoord[] = [];
+    private avalanche: boolean = false;
 
     constructor (
+        private gameManager: GameManager,
         private map: string
     ) {}
 
     public getParsedMap (): ParsedLevel {
         return this.parsedLevel;
+    }
+
+    public getAvalanche (): boolean {
+        return this.avalanche;
+    }
+
+    public startAvalanche (): void {
+        this.avalanche = true;
+    }
+
+    public stopAvalanche (): void {
+        this.avalanche = false;
+    }
+
+    public getLevelLength (): number {
+        return this.levelLength;
     }
 
     public parse (): void {
@@ -32,7 +56,13 @@ export default class Level {
             const rowCoords: LevelCoord[] = [];
 
             row.forEach((entity: number) => {
-                rowCoords.push({ x, y, entity });
+                let value: number = 0;
+
+                if (entity === 4) {
+                    value = 150;
+                }
+
+                rowCoords.push({ x, y, entity, value, spent: false });
                 x++;
             });
 
@@ -43,6 +73,9 @@ export default class Level {
 
             return parsedMap;
         }, []);
+
+        // Set length / number of rows
+        this.levelLength = y;
     }
 
     public getDestination (
@@ -66,7 +99,39 @@ export default class Level {
             return this.getDestination([next.x, next.y], direction);
         }
 
+        // GOAL!
+        if (next.entity === 3) {
+            return next;
+        }
+
+        // COIN!
+        if (next.entity === 4) {
+            if (!next.spent) {
+                this.gameManager.updateScoreBuffer(next.value);
+                next.spent = true;
+                this.destroyedEntities.push(next);
+            }
+
+            return this.getDestination([next.x, next.y], direction);
+        }
+
         return this.getCoord(start);
+    }
+
+    public reset () {
+        this.destroyedEntities = [];
+        this.avalanche = false;
+        this.parsedLevel.forEach((coord: LevelCoord) => {
+            coord.spent = false;
+        });
+    }
+
+    public clearDestroyedEntities (): LevelCoord[] {
+        const entities: LevelCoord[] = [...this.destroyedEntities];
+
+        this.destroyedEntities = [];
+
+        return entities;
     }
 
     private getNextTile (

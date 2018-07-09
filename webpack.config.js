@@ -6,8 +6,7 @@ module.exports = {
     entry: ['./src/index.ts'],
     output: {
         filename: 'bundle.js',
-        path: path.resolve(__dirname, 'dist'),
-        publicPath: '/'
+        path: path.resolve(__dirname, 'dist')
     },
     module: {
         rules: [
@@ -18,7 +17,17 @@ module.exports = {
             },
             { test: /pixi\.js$/, loader: 'expose-loader?PIXI' },
             { test: /phaser-split\.js$/, loader: 'expose-loader?Phaser' },
-            { test: /p2\.js$/, loader: 'expose-loader?p2' }
+            { test: /p2\.js$/, loader: 'expose-loader?p2' },
+            {
+                test: /\.(ttf|png|json)$/,
+                use: {
+                    loader: 'file-loader',
+                    options: {
+                        name: '[name].[ext]'
+                    }
+                },
+                exclude: /node_modules/,
+            },
         ]
     },
     resolve: {
